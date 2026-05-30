@@ -7,14 +7,30 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^13.5.0",
+    "antd": "^6.4.3",
+    "axios": "^1.16.1",
+    "classnames": "^2.5.1",
+    "js-cookie": "^3.0.7",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-redux": "^9.3.0",
+    "react-router-dom": "^7.15.1",
     "react-scripts": "5.0.1",
+    "redux-thunk": "^3.1.0",
+    "sass": "^1.100.0",
+    "socket.io-client": "^4.8.3",
     "web-vitals": "^2.1.4"
   },
+  "devDependencies": {
+    "env-cmd": "^10.1.0"
+  },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "env-cmd -f .env-cmdrc -e development react-scripts start",
+    "start:stg": "env-cmd -f .env-cmdrc -e stg react-scripts start",
+    "start:prod": "env-cmd -f .env-cmdrc -e production react-scripts start",
+    "build": "env-cmd -f .env-cmdrc -e development react-scripts build",
+    "build:stg": "env-cmd -f .env-cmdrc -e stg react-scripts build",
+    "build:prod": "env-cmd -f .env-cmdrc -e production react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
