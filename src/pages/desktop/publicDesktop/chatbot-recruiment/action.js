@@ -7,3 +7,19 @@ export const actionGetRecruiment = (params) => {
     params,
   });
 };
+
+export const actionEnsureRecruitmentChatSession = (data) => {
+  return api({
+    method: "POST",
+    url: `/api/recruitment/chat/sessions`,
+    data,
+  });
+};
+
+export const actionSendRecruitmentChatMessage = (data) => {
+  return api({
+    method: "POST",
+    url: `/api/recruitment/chat/messages`,
+    data,
+  });
+};

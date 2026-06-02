@@ -283,7 +283,7 @@
   padding: 3px
   border-radius: 50px
   background: #F2F5FF
-  border: 2px solid var(--colors-common-Primary-300, #8196DB)
+  border: 1px solid var(--colors-common-Primary-300, #8196DB)
   color: #2B3D89
   font-size: 13px
   font-weight: 600
@@ -333,38 +333,79 @@
 .sidebarJobCard
   width: 100%
   box-sizing: border-box
-  border: 1.5px solid #d9ddec
-  border-radius: 12px
+  display: flex
+  flex-direction: column
+  align-items: stretch
+  border: 1px solid #e4e7f1
+  border-radius: 10px
   background: #fff
   text-align: left
-  padding: 12px
+  padding: 10px
   cursor: pointer
-  transition: all 0.2s ease
-  box-shadow: 0 1px 4px rgba(31, 37, 81, 0.1)
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease
+  box-shadow: 0 1px 3px rgba(31, 37, 81, 0.06)
   flex-shrink: 0
+  font-family: inherit
   &:hover
-    border-color: #6269a7
-    box-shadow: 0 2px 8px rgba(47, 63, 169, 0.14)
+    border-color: #8196db
+    box-shadow: 0 2px 8px rgba(47, 63, 169, 0.1)
 
 .sidebarJobCard.active
-  border-color: #2f3fa9
-  background: #eef1ff
-  box-shadow: 0 2px 8px rgba(47, 63, 169, 0.12)
+  border: 2px solid #2f3fa9
+  background: #f2f5ff
+  padding: 15px 17px
+  box-shadow: 0 2px 10px rgba(47, 63, 169, 0.12)
 
-.sidebarJobHead
-  display: flex
-  justify-content: space-between
-  align-items: flex-start
-  gap: 8px
-  margin-bottom: 4px
-  h3
-    margin: 0
-    font-size: 15px
+.sidebarJobTitle
+  margin: 0
+  font-size: 17px
+  line-height: 1.35
+  color: #2b3d89
+  font-weight: 700
+
+.sidebarDepartment
+  margin: 4px 0 12px
+  color: #8a90a7
+  font-size: 13px
+  line-height: 1.4
+
+.sidebarMetaList
+  display: grid
+  grid-template-columns: max-content 1fr
+  column-gap: 48px
+  row-gap: 6px
+  align-items: baseline
+  width: 100%
+  margin-bottom: 12px
+
+.sidebarMetaLine
+  display: contents
+  span
+    color: #8a90a7
+    font-size: 13px
+    line-height: 1.4
+    white-space: nowrap
+  strong
     color: #1f2551
-    font-weight: 700
+    font-weight: 500
+    font-size: 13px
+    line-height: 1.4
+    text-align: left
+    justify-self: start
+    min-width: 0
+    word-break: break-word
+
+.sidebarSalaryBadge
+  align-self: flex-start
+  margin-top: auto
+  padding: 4px 12px 4px 6px
+  :global(svg)
+    width: 22px
+    height: 22px
+    flex-shrink: 0
 
 .departmentLabel
-  margin: 0 0 8px
+  margin: 10px 0 8px
   color: #8a90a7
   font-size: 13px
 
@@ -378,16 +419,6 @@
   strong
     color: #1f2551
     font-weight: 600
-
-.salaryBadgeBlue
-  display: inline-flex
-  margin-top: 8px
-  padding: 4px 10px
-  border-radius: 16px
-  background: #e8ebff
-  color: #2f3fa9
-  font-size: 12px
-  font-weight: 600
 
 .status
   display: inline-flex
@@ -408,7 +439,7 @@
   min-height: 0
   display: flex
   flex-direction: column
-  gap: 10px
+  gap: 12px
   overflow-x: hidden
   overflow-y: auto
   padding-right: 12px
@@ -448,7 +479,7 @@
   justify-content: space-between
   align-items: flex-start
   gap: 16px
-  margin: 0
+  margin: 10px
   padding: 16px 18px
   background: #fff
   border: 1px solid #e4e7f1
@@ -460,22 +491,40 @@
     font-size: 28px
     font-weight: 700
 
+.detailTitle
+  font-size: 28px
+  font-weight: 700
+  color: #2B3D89
+
 .detailHeaderInfo
   flex: 1
   min-width: 0
 
 .detailMetaBar
   display: flex
-  flex-wrap: wrap
   align-items: center
-  gap: 8px
-  margin-top: 10px
+  justify-content: space-between
+  width: 100%
+  margin-top: 12px
+  gap: 8px 16px
+
+.detailMetaItem
+  flex: 1
+  min-width: 0
+  text-align: center
   font-size: 13px
+  line-height: 1.4
   color: #1f2551
+  white-space: nowrap
   em
     font-style: normal
     color: #8a90a7
-    margin-right: 4px
+    margin-right: 6px
+
+.detailMetaBar .metaDivider
+  flex-shrink: 0
+  padding: 0 4px
+  color: #c5cae0
 
 .applyButton
   display: inline-flex
@@ -503,6 +552,7 @@
   border: 1px solid #e4e7f1
   border-radius: 10px
   box-shadow: 0 1px 4px rgba(31, 37, 81, 0.08)
+  margin: 10px
 
 .detailSection
   margin-top: 20px
@@ -694,8 +744,16 @@
   flex-direction: column
   gap: 12px
 
+.chatMessagesWrap
+  position: relative
+  flex: 1
+  min-height: 0
+  display: flex
+  flex-direction: column
+
 .chatMessages
   flex: 1
+  min-height: 0
   border: 1px solid #e4e7f1
   border-radius: 12px
   padding: 14px
@@ -704,6 +762,25 @@
   display: flex
   flex-direction: column
   gap: 12px
+
+.scrollToBottomBtn
+  position: absolute !important
+  right: 16px
+  bottom: 16px
+  z-index: 2
+  width: 40px !important
+  height: 40px !important
+  min-width: 40px !important
+  padding: 0 !important
+  box-shadow: 0 4px 14px rgba(47, 63, 169, 0.35)
+
+.scrollToBottomIcon
+  display: block
+  width: 10px
+  height: 10px
+  border-right: 2px solid #fff
+  border-bottom: 2px solid #fff
+  transform: rotate(45deg) translate(-2px, -2px)
 
 .chatMessagesAnchor
   height: 1px
@@ -809,22 +886,23 @@
   margin-top: 14px
 
 .jdStickyPin
-  display: flex
+  display: flex !important
   align-items: center
   gap: 10px
   width: 100%
-  padding: 8px 12px
+  height: auto !important
+  padding: 8px 12px !important
   margin-bottom: 8px
-  border: 1px solid #d3daf5
-  border-left: 4px solid #2f3fa9
-  border-radius: 10px
-  background: #eef1ff
+  border: 1px solid #d3daf5 !important
+  border-left: 4px solid #2f3fa9 !important
+  border-radius: 10px !important
+  background: #eef1ff !important
   cursor: pointer
   text-align: left
   flex-shrink: 0
   transition: background 0.2s ease
   &:hover
-    background: #e4e9ff
+    background: #e4e9ff !important
 
 .jdStickyPinAvatar
   flex-shrink: 0
@@ -864,29 +942,23 @@
   display: flex
   gap: 8px
   flex-wrap: wrap
-  button
-    border: 1px solid #d3d7ec
-    border-radius: 20px
-    padding: 6px 12px
-    background: #fff
-    cursor: pointer
-    font-size: 12px
+
+.quickActionBtn
+  border: 1px solid #d3d7ec !important
+  border-radius: 20px !important
+  padding: 6px 12px !important
+  background: #fff !important
+  font-size: 12px
+  height: auto !important
 
 .chatInput
   display: flex
   gap: 8px
-  input
+  align-items: center
+  :global(.ant-input-affix-wrapper)
     flex: 1
-    border: 1px solid #d9ddec
-    border-radius: 10px
-    padding: 10px 12px
-  button
-    border: none
-    border-radius: 10px
-    background: #2f3fa9
-    color: #fff
+  :global(.ant-btn)
     min-width: 80px
-    cursor: pointer
 
 .candidateModal
   :global(.ant-modal-content)
@@ -905,6 +977,7 @@
   display: flex
   flex-direction: column
   min-height: 0
+  border-radius: 8px
 
 .workspaceMainChat
   border-radius: 8px

@@ -127,7 +127,7 @@ const FilterSidebar = () => {
 };
 
 const LIST_META_FIELDS = [
-  { label: "Địa điểm", key: "location" },
+  // { label: "Địa điểm", key: "location" },
   { label: "Số lượng cần tuyển", key: "quantity" },
   { label: "Kinh nghiệm", key: "experience" },
   { label: "Trình độ học vấn", key: "education" },

@@ -35,7 +35,7 @@ export const RecruitmentProvider = ({ children }) => {
   );
   const [candidateModalOpen, setCandidateModalOpen] = useState(false);
   const [modalCampaignId, setModalCampaignId] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [messagesByCampaign, setMessagesByCampaign] = useState({});
 
   const isCandidateRegistered = useMemo(
     () => hasCandidateInfo(candidateInfo),
@@ -88,8 +88,21 @@ export const RecruitmentProvider = ({ children }) => {
     saveCandidateToStorage(info);
   }, []);
 
+  const getMessagesForCampaign = useCallback(
+    (campaignId) => messagesByCampaign[String(campaignId)] ?? [],
+    [messagesByCampaign],
+  );
+
+  const setMessagesForCampaign = useCallback((campaignId, updater) => {
+    const key = String(campaignId);
+    setMessagesByCampaign((prev) => ({
+      ...prev,
+      [key]: typeof updater === "function" ? updater(prev[key] ?? []) : updater,
+    }));
+  }, []);
+
   const startChatSession = useCallback(
-    (values, campaignTitle = "") => {
+    (values) => {
       const info = {
         fullName: values.fullName?.trim() || "",
         email: values.email?.trim() || "",
@@ -99,15 +112,6 @@ export const RecruitmentProvider = ({ children }) => {
       saveCandidateInfo(info);
       setChatStarted(true);
       setCandidateModalOpen(false);
-      setMessages([
-        {
-          id: Date.now(),
-          from: "bot",
-          text: campaignTitle
-            ? `Xin chào ${info.fullName}, mình là trợ lý tuyển dụng AI. Bạn muốn hỏi gì về vị trí ${campaignTitle}?`
-            : `Xin chào ${info.fullName}, mình là trợ lý tuyển dụng AI. Hãy chọn vị trí bên trái để xem chi tiết và trò chuyện.`,
-        },
-      ]);
     },
     [saveCandidateInfo],
   );
@@ -156,8 +160,9 @@ export const RecruitmentProvider = ({ children }) => {
         closeCandidateModal,
         startChatSession,
         requestChatAccess,
-        messages,
-        setMessages,
+        getMessagesForCampaign,
+        setMessagesForCampaign,
+        messagesByCampaign,
       }}
     >
       {children}

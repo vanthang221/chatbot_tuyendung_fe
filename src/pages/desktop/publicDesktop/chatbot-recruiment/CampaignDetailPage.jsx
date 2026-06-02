@@ -1,12 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import classNames from "classnames/bind";
 import { Button, Input } from "antd";
-import { Logo } from "../../../../assets/svg/logo";
+import { Logo, IconMoney } from "../../../../assets/svg/logo";
 import HeaderChatCta from "./HeaderChatCta";
-import CampaignChatPanel, {
-  buildChatMessagesForCampaign,
-} from "./CampaignChatPanel";
+import CampaignChatPanel from "./CampaignChatPanel";
 import { useRecruitment } from "../../../../context/RecruitmentContext";
 
 import { findCampaignById } from "./campaignUtils";
@@ -50,43 +48,35 @@ const PageHeader = ({ onOpenChat }) => {
   );
 };
 
+const SIDEBAR_META_FIELDS = [
+  { label: "Địa điểm", key: "location" },
+  { label: "Số lượng cần tuyển", key: "quantity" },
+  { label: "Kinh nghiệm", key: "experience" },
+  { label: "Trình độ học vấn", key: "education" },
+];
+
 const SidebarJobCard = ({ campaign, active, onClick }) => (
   <button
     type="button"
     className={cx("sidebarJobCard", { active })}
     onClick={onClick}
   >
-    <div className={cx("sidebarJobHead")}>
-      <h3>{campaign.title}</h3>
+    <h3 className={cx("sidebarJobTitle")}>{campaign.title}</h3>
+    <p className={cx("sidebarDepartment")}>{campaign.department}</p>
+
+    <div className={cx("sidebarMetaList")}>
+      {SIDEBAR_META_FIELDS.map((field) => (
+        <div key={field.key} className={cx("sidebarMetaLine")}>
+          <span>{field.label}</span>
+          <strong>{campaign[field.key] ?? "—"}</strong>
+        </div>
+      ))}
     </div>
 
-    <p className={cx("departmentLabel")}>{campaign.department}</p>
-
-    <div className={cx("metaLine")}>
-      <span>Địa điểm</span>
-
-      <strong>{campaign.location}</strong>
+    <div className={cx("salaryBadgeGreen", "sidebarSalaryBadge")}>
+      <IconMoney />
+      <span>{campaign.salaryRange}</span>
     </div>
-
-    <div className={cx("metaLine")}>
-      <span>Số lượng cần tuyển</span>
-
-      <strong>{campaign.quantity}</strong>
-    </div>
-
-    <div className={cx("metaLine")}>
-      <span>Kinh nghiệm</span>
-
-      <strong>{campaign.experience}</strong>
-    </div>
-
-    <div className={cx("metaLine")}>
-      <span>Trình độ học vấn</span>
-
-      <strong>{campaign.education}</strong>
-    </div>
-
-    <div className={cx("salaryBadgeBlue")}>{campaign.salaryRange}</div>
   </button>
 );
 
@@ -110,30 +100,28 @@ const DetailPanel = ({ campaign, onApply }) => (
   <div className={cx("detailPanel")}>
     <div className={cx("detailHeader")}>
       <div className={cx("detailHeaderInfo")}>
-        <h1>{campaign.title}</h1>
+        <span className={cx("detailTitle")}>{campaign.title}</span>
 
         <p className={cx("departmentLabel")}>{campaign.department}</p>
 
         <div className={cx("detailMetaBar")}>
-          <span>
-            <em>Địa điểm</em> {campaign.location}
-          </span>
-
-          <span className={cx("metaDivider")}>|</span>
-
-          <span>
+          <span className={cx("detailMetaItem")}>
             <em>Số lượng cần tuyển</em> {campaign.quantity}
           </span>
 
-          <span className={cx("metaDivider")}>|</span>
+          <span className={cx("metaDivider")} aria-hidden="true">
+            |
+          </span>
 
-          <span>
+          <span className={cx("detailMetaItem")}>
             <em>Kinh nghiệm</em> {campaign.experience}
           </span>
 
-          <span className={cx("metaDivider")}>|</span>
+          <span className={cx("metaDivider")} aria-hidden="true">
+            |
+          </span>
 
-          <span>
+          <span className={cx("detailMetaItem")}>
             <em>Học vấn</em> {campaign.education}
           </span>
         </div>
@@ -188,21 +176,11 @@ const CampaignDetailPage = () => {
     requestChatAccess,
 
     setChatStarted,
-
-    setMessages,
-
-    candidateInfo,
   } = useRecruitment();
 
   const campaign = findCampaignById(campaigns, campaignId);
 
   const showChat = chatStarted && isCandidateRegistered;
-
-  useEffect(() => {
-    if (!showChat || !campaign) return;
-
-    setMessages(buildChatMessagesForCampaign(campaign, candidateInfo.fullName));
-  }, [campaignId, showChat, campaign, candidateInfo.fullName, setMessages]);
 
   const handleOpenChat = () => {
     if (!requestChatAccess(campaignId)) return;
