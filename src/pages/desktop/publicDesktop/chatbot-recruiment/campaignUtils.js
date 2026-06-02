@@ -1,20 +1,30 @@
+import {
+  EDUCATION_LEVEL,
+  EXPERIENCE,
+} from "../../../../utils/constants/config";
+
 export const DEFAULT_JOB_DESCRIPTION = [
   "Mô tả công việc sẽ được cập nhật bởi phòng tuyển dụng.",
 ];
-export const DEFAULT_REQUIREMENTS = ["Yêu cầu sẽ được cập nhật bởi phòng tuyển dụng."];
-export const DEFAULT_BENEFITS = ["Quyền lợi sẽ được cập nhật bởi phòng tuyển dụng."];
+export const DEFAULT_REQUIREMENTS = [
+  "Yêu cầu sẽ được cập nhật bởi phòng tuyển dụng.",
+];
+export const DEFAULT_BENEFITS = [
+  "Quyền lợi sẽ được cập nhật bởi phòng tuyển dụng.",
+];
 export const DEFAULT_WORKING_TIME = ["Thời gian làm việc sẽ được cập nhật."];
 
-export const EXPERIENCE_OPTIONS = [
-  "Không yêu cầu",
-  "Dưới 1 năm",
-  "1 năm",
-  "2 năm",
-  "3 năm",
-  "4 năm",
-  "5 năm",
-  "Trên 5 năm",
+export const FILTER_ALL = "Tất cả";
+
+const toFilterOptions = (configMap) => [
+  { value: FILTER_ALL, label: FILTER_ALL },
+  ...Object.entries(configMap).map(([value, label]) => ({
+    value: Number(value),
+    label,
+  })),
 ];
+
+export const EXPERIENCE_OPTIONS = toFilterOptions(EXPERIENCE);
 
 export const SALARY_OPTIONS = [
   "Tất cả",
@@ -28,19 +38,10 @@ export const SALARY_OPTIONS = [
   "Thỏa thuận",
 ];
 
-export const EDUCATION_OPTIONS = [
-  "Tất cả",
-  "12/12",
-  "Sơ cấp",
-  "Trung cấp",
-  "Cao đẳng",
-  "Đại học",
-  "Trên đại học",
-];
+export const EDUCATION_OPTIONS = toFilterOptions(EDUCATION_LEVEL);
 
-export const FILTER_ALL = "Tất cả";
-
-export const isFilterAll = (value) => !value || value === FILTER_ALL;
+export const isFilterAll = (value) =>
+  value === FILTER_ALL || value === null || value === undefined || value === "";
 
 export const buildCampaignListParams = ({
   name = "",
@@ -60,9 +61,8 @@ export const buildCampaignListParams = ({
     params.name = trimmedName;
   }
 
-  const trimmedExperience = String(experience || "").trim();
-  if (trimmedExperience) {
-    params.experience = trimmedExperience;
+  if (!isFilterAll(experience)) {
+    params.experience = experience;
   }
 
   if (!isFilterAll(salary)) {
@@ -82,9 +82,20 @@ const FIELD_CANDIDATES = {
   department: ["department", "department_name", "team", "phong_ban"],
   location: ["location", "work_place", "city", "dia_diem"],
   quantity: ["quantity", "vacancy", "headcount", "so_luong"],
-  deadline: ["end_time", "deadline", "expired_at", "expire_date", "han_tuyen_dung"],
+  deadline: [
+    "end_time",
+    "deadline",
+    "expired_at",
+    "expire_date",
+    "han_tuyen_dung",
+  ],
   status: ["status", "recruitment_status", "trang_thai"],
-  description: ["jd_job_description", "description", "job_description", "mo_ta"],
+  description: [
+    "jd_job_description",
+    "description",
+    "job_description",
+    "mo_ta",
+  ],
   requirements: [
     "jd_competency_requirements",
     "requirements",
@@ -94,7 +105,13 @@ const FIELD_CANDIDATES = {
   benefits: ["jd_benefits", "benefits", "welfare", "quyen_loi"],
   salaryRange: ["jd_salary_range", "salary_range", "salary"],
   workingTime: ["working_time", "working_hours", "gio_lam_viec"],
-  experience: ["experience", "experience_level", "experience_years", "kinh_nghiem"],
+  experience: [
+    "experience",
+    "experience_level",
+    "experience_years",
+    "kinh_nghiem",
+  ],
+  education: ["education_level", "education", "educationLevel", "hoc_van"],
 };
 
 const getFirstValue = (record, keys, fallback = "") => {
@@ -145,28 +162,27 @@ const formatDateFromUnix = (value, fallback = "--/--/----") => {
   return `${day}/${month}/${year}`;
 };
 
-const normalizeExperience = (value) => {
-  const experienceMap = {
-    0: "Không yêu cầu",
-    1: "Dưới 1 năm",
-    2: "1 năm",
-    3: "2 năm",
-    4: "3 năm",
-    5: "4 năm",
-    6: "5 năm",
-    7: "Trên 5 năm",
-  };
-
-  if (typeof value === "number" || (typeof value === "string" && /^\d+$/.test(value))) {
-    return experienceMap[Number(value)] || "Không yêu cầu";
+const lookupLevelLabel = (value, map, fallback = "—") => {
+  if (
+    typeof value === "number" ||
+    (typeof value === "string" && /^\d+$/.test(value))
+  ) {
+    const label = map[Number(value)];
+    return label ?? fallback;
   }
 
   if (typeof value === "string" && value.trim()) {
-    return value;
+    return value.trim();
   }
 
-  return "Không yêu cầu";
+  return fallback;
 };
+
+export const getExperienceLabel = (value) =>
+  lookupLevelLabel(value, EXPERIENCE, EXPERIENCE[0]);
+
+export const getEducationLabel = (value) =>
+  lookupLevelLabel(value, EDUCATION_LEVEL);
 
 const normalizeStatus = (value) => {
   const statusMap = {
@@ -185,12 +201,17 @@ const normalizeSalaryDisplay = (value) => {
 };
 
 export const normalizeCampaign = (item, index) => {
-  const status = normalizeStatus(getFirstValue(item, FIELD_CANDIDATES.status, 1));
+  const status = normalizeStatus(
+    getFirstValue(item, FIELD_CANDIDATES.status, 1),
+  );
   const salaryRange = normalizeSalaryDisplay(
     getFirstValue(item, FIELD_CANDIDATES.salaryRange, ""),
   );
-  const experience = normalizeExperience(
+  const experience = getExperienceLabel(
     getFirstValue(item, FIELD_CANDIDATES.experience, ""),
+  );
+  const education = getEducationLabel(
+    getFirstValue(item, FIELD_CANDIDATES.education, ""),
   );
 
   return {
@@ -198,13 +219,22 @@ export const normalizeCampaign = (item, index) => {
     title: getFirstValue(item, FIELD_CANDIDATES.title, "Vị trí đang tuyển"),
     department: getFirstValue(item, FIELD_CANDIDATES.department, "Phòng ban"),
     location: getFirstValue(item, FIELD_CANDIDATES.location, "Hà Nội"),
-    quantity: String(getFirstValue(item, FIELD_CANDIDATES.quantity, "01")).padStart(2, "0"),
-    deadline: formatDateFromUnix(getFirstValue(item, FIELD_CANDIDATES.deadline, "")),
+    quantity: String(
+      getFirstValue(item, FIELD_CANDIDATES.quantity, "01"),
+    ).padStart(2, "0"),
+    deadline: formatDateFromUnix(
+      getFirstValue(item, FIELD_CANDIDATES.deadline, ""),
+    ),
     status,
     experience,
+    education,
     salaryRange,
     description: toArrayText(
-      getFirstValue(item, FIELD_CANDIDATES.description, DEFAULT_JOB_DESCRIPTION),
+      getFirstValue(
+        item,
+        FIELD_CANDIDATES.description,
+        DEFAULT_JOB_DESCRIPTION,
+      ),
       DEFAULT_JOB_DESCRIPTION,
     ),
     requirements: toArrayText(

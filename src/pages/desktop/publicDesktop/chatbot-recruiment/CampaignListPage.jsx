@@ -1,19 +1,28 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import classNames from "classnames/bind";
-import { Button, Input, Radio } from "antd";
+import { Button, Col, Input, Radio, Row, Tooltip } from "antd";
 import { IconMoney, Logo } from "../../../../assets/svg/logo";
 import HeaderChatCta from "./HeaderChatCta";
 import { useRecruitment } from "../../../../context/RecruitmentContext";
-import { EDUCATION_OPTIONS, EXPERIENCE_OPTIONS, SALARY_OPTIONS } from "./campaignUtils";
+import {
+  EDUCATION_OPTIONS,
+  EXPERIENCE_OPTIONS,
+  SALARY_OPTIONS,
+} from "./campaignUtils";
 import styles from "./ChatBotRecruiment.module.sass";
 
 const cx = classNames.bind(styles);
 
 const PageHeader = () => {
   const navigate = useNavigate();
-  const { searchInput, setSearchInput, handleSearch, campaigns, requestChatAccess } =
-    useRecruitment();
+  const {
+    searchInput,
+    setSearchInput,
+    handleSearch,
+    campaigns,
+    requestChatAccess,
+  } = useRecruitment();
 
   const handleOpenChat = () => {
     requestChatAccess(campaigns[0]?.id);
@@ -38,7 +47,7 @@ const PageHeader = () => {
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Tìm kiếm vị trí"
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            style={{ width: '400px' }}
+            style={{ width: "400px" }}
           />
           <Button type="primary" onClick={handleSearch}>
             Tìm kiếm
@@ -50,7 +59,14 @@ const PageHeader = () => {
 };
 
 const FilterSidebar = () => {
-  const { experienceFilter, setExperienceFilter, salaryFilter, setSalaryFilter, educationFilter, setEducationFilter } = useRecruitment();
+  const {
+    experienceFilter,
+    setExperienceFilter,
+    salaryFilter,
+    setSalaryFilter,
+    educationFilter,
+    setEducationFilter,
+  } = useRecruitment();
 
   return (
     <aside className={cx("filterSidebar")}>
@@ -62,8 +78,12 @@ const FilterSidebar = () => {
           onChange={(e) => setExperienceFilter(e.target.value)}
         >
           {EXPERIENCE_OPTIONS.map((option) => (
-            <Radio key={option} value={option} className={cx("filterOption")}>
-              {option}
+            <Radio
+              key={String(option.value)}
+              value={option.value}
+              className={cx("filterOption")}
+            >
+              {option.label}
             </Radio>
           ))}
         </Radio.Group>
@@ -92,8 +112,12 @@ const FilterSidebar = () => {
           onChange={(e) => setEducationFilter(e.target.value)}
         >
           {EDUCATION_OPTIONS.map((option) => (
-            <Radio key={option} value={option} className={cx("filterOption")}>
-              {option}
+            <Radio
+              key={String(option.value)}
+              value={option.value}
+              className={cx("filterOption")}
+            >
+              {option.label}
             </Radio>
           ))}
         </Radio.Group>
@@ -102,24 +126,35 @@ const FilterSidebar = () => {
   );
 };
 
+const LIST_META_FIELDS = [
+  { label: "Địa điểm", key: "location" },
+  { label: "Số lượng cần tuyển", key: "quantity" },
+  { label: "Kinh nghiệm", key: "experience" },
+  { label: "Trình độ học vấn", key: "education" },
+];
+
 const ListJobCard = ({ campaign, onClick }) => (
   <div type="text" block className={cx("listJobCard")} onClick={onClick}>
     <div className={cx("listJobCardBody")}>
       <h3>{campaign.title}</h3>
       <p className={cx("departmentLabel")}>{campaign.department}</p>
-      <div className={cx("inlineMeta")}>
-        <span>
-          <em>Địa điểm</em> {campaign.location}
-        </span>
-        <span className={cx("metaDivider")}>|</span>
-        <span>
-          <em>Số lượng cần tuyển</em> {campaign.quantity}
-        </span>
-        <span className={cx("metaDivider")}>|</span>
-        <span>
-          <em>Kinh nghiệm</em> {campaign.experience}
-        </span>
-      </div>
+      <Row className={cx("inlineMeta")} gutter={[12, 8]}>
+        {LIST_META_FIELDS.map((field) => {
+          const value = campaign[field.key] ?? "";
+          const tooltipTitle = `${field.label}: ${value}`;
+
+          return (
+            <Col key={field.key} xs={24} md={6} className={cx("metaCol")}>
+              <Tooltip title={tooltipTitle} placement="top">
+                <div className={cx("metaCell")}>
+                  <span className={cx("metaLabel")}>{field.label}</span>
+                  <strong className={cx("metaValue")}>{value}</strong>
+                </div>
+              </Tooltip>
+            </Col>
+          );
+        })}
+      </Row>
     </div>
     <div className={cx("salaryBadgeGreen")}>
       <IconMoney />

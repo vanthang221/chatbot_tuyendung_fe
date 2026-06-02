@@ -193,7 +193,7 @@
 
 .listJobCard
   display: flex
-  align-items: center
+  align-items: flex-start
   justify-content: space-between
   gap: 16px
   background: #fff
@@ -210,6 +210,9 @@
   &:hover
     border-color: #6269a7
     box-shadow: 0 2px 8px rgba(47, 63, 169, 0.1)
+  @media (max-width: 768px)
+    flex-direction: column
+    align-items: stretch
 
 .listJobCardBody
   flex: 1
@@ -223,16 +226,52 @@
     margin: 4px 0 10px
 
 .inlineMeta
-  display: flex
-  flex-wrap: wrap
+  width: 100%
+  margin-top: 2px
+
+.metaCol
+  min-width: 0
+
+  @media (min-width: 768px)
+    &:not(:last-child)
+      border-right: 1px solid #8196db
+
+    &:first-child .metaCell
+      padding-left: 0
+
+    &:last-child .metaCell
+      padding-right: 0
+
+.metaCell
+  display: grid
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)
+  column-gap: 8px
   align-items: center
-  gap: 8px
+  width: 100%
+  min-width: 0
+  padding: 0 10px
+  cursor: default
+
+.metaLabel
+  font-size: 12px
+  line-height: 1.4
+  color: #8a90a7
+  font-weight: 400
+  min-width: 0
+  overflow: hidden
+  text-overflow: ellipsis
+  white-space: nowrap
+
+.metaValue
   font-size: 13px
+  line-height: 1.4
   color: #1f2551
-  em
-    font-style: normal
-    color: #8a90a7
-    margin-right: 4px
+  font-weight: 700
+  min-width: 0
+  text-align: right
+  overflow: hidden
+  text-overflow: ellipsis
+  white-space: nowrap
 
 .metaDivider
   color: #c5cae0
@@ -241,7 +280,7 @@
   display: inline-flex
   align-items: center
   gap: 6px
-  padding: 8px 14px
+  padding: 3px
   border-radius: 50px
   background: #F2F5FF
   border: 2px solid var(--colors-common-Primary-300, #8196DB)
@@ -891,4 +930,3 @@
     margin: 0
     color: #7b819e
     font-size: 14px
-

@@ -25,7 +25,7 @@ export const saveCandidateToStorage = (info) => {
 export const hasCandidateInfo = (info) =>
   Boolean(
     info?.fullName?.trim() &&
-      info?.email?.trim() &&
-      info?.phone?.trim() &&
-      info?.consent,
+    info?.email?.trim() &&
+    info?.phone?.trim() &&
+    info?.consent,
   );

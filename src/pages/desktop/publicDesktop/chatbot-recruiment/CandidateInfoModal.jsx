@@ -101,7 +101,12 @@ const CandidateInfoModal = ({ open, onClose, campaignTitle = "" }) => {
             </Checkbox>
           </Form.Item>
           <Form.Item className={cx("submitItem")}>
-            <Button type="primary" htmlType="submit" block className={cx("startButton")}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              block
+              className={cx("startButton")}
+            >
               Bắt đầu trò chuyện
             </Button>
           </Form.Item>

@@ -26,7 +26,7 @@ export const RecruitmentProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [searchName, setSearchName] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  const [experienceFilter, setExperienceFilter] = useState("");
+  const [experienceFilter, setExperienceFilter] = useState(FILTER_ALL);
   const [salaryFilter, setSalaryFilter] = useState(FILTER_ALL);
   const [educationFilter, setEducationFilter] = useState(FILTER_ALL);
   const [candidateInfo, setCandidateInfo] = useState(() => loadCandidateFromStorage());
