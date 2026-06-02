@@ -1,19 +1,27 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import classNames from "classnames/bind";
-import { Logo } from "../../../../assets/svg/logo";
+import { Button, Input, Radio } from "antd";
+import { IconMoney, Logo } from "../../../../assets/svg/logo";
+import HeaderChatCta from "./HeaderChatCta";
 import { useRecruitment } from "../../../../context/RecruitmentContext";
-import { EXPERIENCE_OPTIONS, SALARY_OPTIONS } from "./campaignUtils";
+import { EDUCATION_OPTIONS, EXPERIENCE_OPTIONS, SALARY_OPTIONS } from "./campaignUtils";
 import styles from "./ChatBotRecruiment.module.sass";
 
 const cx = classNames.bind(styles);
 
 const PageHeader = () => {
-  const { searchInput, setSearchInput, handleSearch } = useRecruitment();
+  const navigate = useNavigate();
+  const { searchInput, setSearchInput, handleSearch, campaigns, requestChatAccess } =
+    useRecruitment();
+
+  const handleOpenChat = () => {
+    requestChatAccess(campaigns[0]?.id);
+  };
 
   return (
     <header className={cx("pageHeader")}>
-      <div className={cx("headerBrand")}>
+      <div className={cx("headerBrand")} onClick={() => navigate("/")}>
         <div className={cx("logoBox")}>
           <Logo />
         </div>
@@ -22,66 +30,80 @@ const PageHeader = () => {
           <p>Tư vấn vị trí phù hợp và hỗ trợ tuyển nhanh</p>
         </div>
       </div>
-      <div className={cx("headerSearch")}>
-        <input
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          placeholder="Tìm kiếm vị trí"
-          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-        />
-        <button type="button" onClick={handleSearch}>
-          Tìm kiếm
-        </button>
+      <div className={cx("headerActions")}>
+        <HeaderChatCta onClick={handleOpenChat} />
+        <div className={cx("headerSearch")}>
+          <Input
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Tìm kiếm vị trí"
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            style={{ width: '400px' }}
+          />
+          <Button type="primary" onClick={handleSearch}>
+            Tìm kiếm
+          </Button>
+        </div>
       </div>
     </header>
   );
 };
 
 const FilterSidebar = () => {
-  const { experienceFilter, setExperienceFilter, salaryFilter, setSalaryFilter } =
-    useRecruitment();
+  const { experienceFilter, setExperienceFilter, salaryFilter, setSalaryFilter, educationFilter, setEducationFilter } = useRecruitment();
 
   return (
     <aside className={cx("filterSidebar")}>
       <div className={cx("filterGroup")}>
         <h3>Kinh nghiệm</h3>
-        <div className={cx("filterOptions")}>
+        <Radio.Group
+          className={cx("filterOptions")}
+          value={experienceFilter}
+          onChange={(e) => setExperienceFilter(e.target.value)}
+        >
           {EXPERIENCE_OPTIONS.map((option) => (
-            <label key={option} className={cx("filterOption")}>
-              <input
-                type="radio"
-                name="experience"
-                checked={experienceFilter === option}
-                onChange={() => setExperienceFilter(option)}
-              />
-              <span>{option}</span>
-            </label>
+            <Radio key={option} value={option} className={cx("filterOption")}>
+              {option}
+            </Radio>
           ))}
-        </div>
+        </Radio.Group>
       </div>
       <div className={cx("filterDivider")} />
       <div className={cx("filterGroup")}>
         <h3>Mức lương</h3>
-        <div className={cx("filterOptions")}>
+        <Radio.Group
+          className={cx("filterOptions")}
+          value={salaryFilter}
+          onChange={(e) => setSalaryFilter(e.target.value)}
+        >
           {SALARY_OPTIONS.map((option) => (
-            <label key={option} className={cx("filterOption")}>
-              <input
-                type="radio"
-                name="salary"
-                checked={salaryFilter === option}
-                onChange={() => setSalaryFilter(option)}
-              />
-              <span>{option}</span>
-            </label>
+            <Radio key={option} value={option} className={cx("filterOption")}>
+              {option}
+            </Radio>
           ))}
-        </div>
+        </Radio.Group>
+      </div>
+      <div className={cx("filterDivider")} />
+      <div className={cx("filterGroup")}>
+        <h3>Trình độ học vấn</h3>
+        <Radio.Group
+          className={cx("filterOptions")}
+          value={educationFilter}
+          onChange={(e) => setEducationFilter(e.target.value)}
+        >
+          {EDUCATION_OPTIONS.map((option) => (
+            <Radio key={option} value={option} className={cx("filterOption")}>
+              {option}
+            </Radio>
+          ))}
+        </Radio.Group>
       </div>
     </aside>
   );
 };
 
 const ListJobCard = ({ campaign, onClick }) => (
-  <button type="button" className={cx("listJobCard")} onClick={onClick}>
+  <div type="text" block className={cx("listJobCard")} onClick={onClick}>
     <div className={cx("listJobCardBody")}>
       <h3>{campaign.title}</h3>
       <p className={cx("departmentLabel")}>{campaign.department}</p>
@@ -100,15 +122,15 @@ const ListJobCard = ({ campaign, onClick }) => (
       </div>
     </div>
     <div className={cx("salaryBadgeGreen")}>
-      <span className={cx("salaryIcon")}>💰</span>
+      <IconMoney />
       {campaign.salaryRange}
     </div>
-  </button>
+  </div>
 );
 
 const CampaignListPage = () => {
   const navigate = useNavigate();
-  const { filteredCampaigns } = useRecruitment();
+  const { campaigns, loading } = useRecruitment();
 
   return (
     <>
@@ -116,8 +138,12 @@ const CampaignListPage = () => {
       <div className={cx("listBody")}>
         <FilterSidebar />
         <main className={cx("listMain")}>
-          {filteredCampaigns.length > 0 ? (
-            filteredCampaigns.map((item) => (
+          {loading ? (
+            <div className={cx("emptyList")}>
+              <p>Đang tải danh sách vị trí...</p>
+            </div>
+          ) : campaigns.length > 0 ? (
+            campaigns.map((item) => (
               <ListJobCard
                 key={item.id}
                 campaign={item}

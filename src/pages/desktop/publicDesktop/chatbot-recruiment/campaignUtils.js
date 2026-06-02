@@ -28,6 +28,54 @@ export const SALARY_OPTIONS = [
   "Thỏa thuận",
 ];
 
+export const EDUCATION_OPTIONS = [
+  "Tất cả",
+  "12/12",
+  "Sơ cấp",
+  "Trung cấp",
+  "Cao đẳng",
+  "Đại học",
+  "Trên đại học",
+];
+
+export const FILTER_ALL = "Tất cả";
+
+export const isFilterAll = (value) => !value || value === FILTER_ALL;
+
+export const buildCampaignListParams = ({
+  name = "",
+  experience = "",
+  salary = FILTER_ALL,
+  education = FILTER_ALL,
+  pageNum = 1,
+  pageSize = 100,
+} = {}) => {
+  const params = {
+    page_num: pageNum,
+    page_size: pageSize,
+  };
+
+  const trimmedName = String(name || "").trim();
+  if (trimmedName) {
+    params.name = trimmedName;
+  }
+
+  const trimmedExperience = String(experience || "").trim();
+  if (trimmedExperience) {
+    params.experience = trimmedExperience;
+  }
+
+  if (!isFilterAll(salary)) {
+    params.salary_filter = salary;
+  }
+
+  if (!isFilterAll(education)) {
+    params.education_filter = education;
+  }
+
+  return params;
+};
+
 const FIELD_CANDIDATES = {
   id: ["id", "_id", "campaign_id"],
   title: ["title", "name", "position_name", "position", "campaign_name"],
@@ -177,6 +225,11 @@ export const normalizeCampaign = (item, index) => {
 export const extractCampaignList = (payload) => {
   if (Array.isArray(payload)) return payload;
   if (!payload || typeof payload !== "object") return [];
+
+  // Axios: response.data = { success, data: [...], pagination }
+  if (Array.isArray(payload.data)) {
+    return payload.data;
+  }
 
   const possibleKeys = ["data", "items", "results", "campaigns", "rows"];
   for (const key of possibleKeys) {
