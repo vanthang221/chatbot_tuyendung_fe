@@ -35,3 +35,32 @@ export const findPageByPath = (currentPath, pages = []) => {
 
   return page;
 };
+
+export const getFullUrlStaticFilePDF = (path) => {
+  const server_url = getServerBaseUrl();
+  let url = `${path}`
+    .replace("_internal\\", "")
+    .replace("_internal/", "")
+    .replace("server\\", "")
+    .replace("server/", "")
+    .replace("src\\", "")
+    .replace("src/", "");
+
+  if (server_url) {
+    url = `${server_url}/${url}`;
+  } else {
+    url = `${window.location.origin}/${url}`;
+  }
+
+  return url;
+};
+
+export const getUrlToOff = (path) => {
+  let url = getFullUrlStaticFilePDF(path);
+
+  if (isEmpty(REACT_APP_SERVER_BASE_URL)) {
+    url = `${window.location.origin}/${url}`;
+  }
+
+  return url;
+};

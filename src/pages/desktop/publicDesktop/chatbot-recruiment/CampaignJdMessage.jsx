@@ -1,6 +1,7 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useState } from "react";
 import classNames from "classnames/bind";
 import { Chatbot } from "../../../../assets/svg";
+import UploadCvModal from "./UploadCvModal";
 import styles from "./ChatBotRecruiment.module.sass";
 
 const cx = classNames.bind(styles);
@@ -20,7 +21,30 @@ const JdSection = ({ icon, title, values }) => (
 );
 
 const CampaignJdMessage = forwardRef(
-  ({ campaign, onApply, showApplyButton }, ref) => (
+  (
+    {
+      campaign,
+      showApplyButton,
+      campaignId,
+      candidateId,
+      uploadContext,
+      onCvUploaded,
+      onApply,
+    },
+    ref,
+  ) => {
+    const [uploadOpen, setUploadOpen] = useState(false);
+
+    const handleApplyClick = () => {
+      setUploadOpen(true);
+    };
+
+    const handleUploadSuccess = (uploadResult) => {
+      onCvUploaded?.(uploadResult);
+      onApply?.();
+    };
+
+    return (
     <div ref={ref} className={cx("messageRow", "bot", "jdMessageRow")}>
       <div className={cx("jdMessageAvatar")} aria-hidden="true">
         <Chatbot />
@@ -52,15 +76,25 @@ const CampaignJdMessage = forwardRef(
           <button
             type="button"
             className={cx("applyButton", "jdApplyButton")}
-            onClick={onApply}
+            onClick={handleApplyClick}
           >
             <span className={cx("applyIcon")}>📄</span>
             Ứng tuyển ngay
           </button>
         )}
       </div>
+
+      <UploadCvModal
+        open={uploadOpen}
+        onClose={() => setUploadOpen(false)}
+        campaignId={campaignId}
+        candidateId={candidateId}
+        uploadContext={uploadContext}
+        onSuccess={handleUploadSuccess}
+      />
     </div>
-  ),
+    );
+  },
 );
 
 CampaignJdMessage.displayName = "CampaignJdMessage";

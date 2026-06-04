@@ -1,9 +1,7 @@
-/* eslint-disable no-undef */
 import { useEffect, useState } from 'react'
 
 function useMediaQuery(query) {
   const getMatches = (query) => {
-    // Prevents SSR issues
     if (typeof window !== 'undefined') {
       return window.matchMedia(query).matches
     }

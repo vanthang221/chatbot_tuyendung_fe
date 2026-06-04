@@ -23,3 +23,11 @@ export const actionSendRecruitmentChatMessage = (data) => {
     data,
   });
 };
+
+export const actionUploadRecruitmentFile = (formData) => {
+  return api({
+    method: "POST",
+    url: `/api/recruitment/files/upload`,
+    data: formData,
+  });
+};

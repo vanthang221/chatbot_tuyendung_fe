@@ -804,11 +804,142 @@
     background: #e8ebff
     color: #1f2551
 
+.typingBubble
+  display: inline-flex
+  align-items: center
+  gap: 6px
+  min-width: 160px
+
+.typingText
+  font-size: 14px
+  color: #5a6080
+
+.typingDots
+  display: inline-flex
+  align-items: center
+  gap: 4px
+  span
+    width: 6px
+    height: 6px
+    border-radius: 50%
+    background: #2f3fa9
+    opacity: 0.35
+    animation: typingDotPulse 1.2s infinite ease-in-out
+    &:nth-child(2)
+      animation-delay: 0.15s
+    &:nth-child(3)
+      animation-delay: 0.3s
+
+@keyframes typingDotPulse
+  0%, 80%, 100%
+    opacity: 0.35
+    transform: translateY(0)
+  40%
+    opacity: 1
+    transform: translateY(-2px)
+
 .messageRow.user
   justify-content: flex-end
   .messageBubble
     background: #2f3fa9
     color: #fff
+
+.userMessageBubble
+  display: flex
+  flex-direction: column
+  gap: 8px
+
+.chatFileAttachment
+  display: flex
+  align-items: center
+  gap: 10px
+  width: 100%
+  max-width: 280px
+  padding: 8px 10px
+  border: 1px solid rgba(255, 255, 255, 0.35)
+  border-radius: 10px
+  background: rgba(255, 255, 255, 0.12)
+  color: #fff
+  cursor: pointer
+  text-align: left
+  transition: background 0.2s
+  &:hover
+    background: rgba(255, 255, 255, 0.2)
+
+.chatFileAttachmentIcon
+  flex-shrink: 0
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  :global(svg)
+    width: 28px
+    height: auto
+    display: block
+
+.chatFileAttachmentName
+  font-size: 13px
+  font-weight: 500
+  line-height: 1.35
+  word-break: break-word
+
+/* bot bubble style override */
+.messageRow.bot
+  .chatFileAttachment
+    background: #f3f5fb
+    color: #1f2551
+    border: 1px solid #e4e7f1
+    &:hover
+      background: #eef1ff
+
+/* ensure user bubble file appearance */
+.messageRow.user
+  .chatFileAttachment
+    background: rgba(255, 255, 255, 0.12)
+    color: #fff
+    border: 1px solid rgba(255, 255, 255, 0.18)
+
+.markdownContent
+  word-break: break-word
+  :global(p)
+    margin: 0 0 8px
+    &:last-child
+      margin-bottom: 0
+  :global(ul),
+  :global(ol)
+    margin: 0 0 8px
+    padding-left: 20px
+  :global(li)
+    margin-bottom: 4px
+    &:last-child
+      margin-bottom: 0
+  :global(strong)
+    font-weight: 700
+  :global(em)
+    font-style: italic
+  :global(a)
+    color: #2f3fa9
+    text-decoration: underline
+    word-break: break-all
+  :global(code)
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace
+    font-size: 0.92em
+    padding: 1px 4px
+    border-radius: 4px
+    background: rgba(47, 63, 169, 0.08)
+  :global(pre)
+    margin: 0 0 8px
+    padding: 8px 10px
+    border-radius: 8px
+    background: rgba(47, 63, 169, 0.08)
+    overflow-x: auto
+    :global(code)
+      padding: 0
+      background: transparent
+  :global(blockquote)
+    margin: 0 0 8px
+    padding-left: 10px
+    border-left: 3px solid #c5cae0
+    color: #5a6080
 
 .botMessageAvatar
   flex-shrink: 0
@@ -967,6 +1098,133 @@
   :global(.ant-modal-close)
     top: 12px
     right: 12px
+
+.uploadCvModal
+  :global(.ant-modal-content)
+    border-radius: 12px
+
+.uploadCvHint
+  margin: 0 0 14px
+  color: #5c6380
+  font-size: 14px
+  line-height: 1.5
+
+.uploadCvDropzone
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  gap: 6px
+  width: 100%
+  min-height: 140px
+  padding: 20px 16px
+  border: 1px dashed #b8bfd8
+  border-radius: 10px
+  background: #f7f8fc
+  cursor: pointer
+  transition: border-color 0.2s, background 0.2s
+  &:hover:not(:disabled)
+    border-color: #2f3fa9
+    background: #eef1ff
+  &:disabled
+    opacity: 0.6
+    cursor: not-allowed
+
+.uploadCvDropzoneIcon
+  font-size: 32px
+  line-height: 1
+
+.uploadCvDropzoneTitle
+  font-weight: 600
+  color: #1f2551
+  font-size: 14px
+  text-align: center
+  word-break: break-word
+
+.uploadCvDropzoneSub
+  font-size: 12px
+  color: #7b819e
+
+.uploadCvFileInput
+  display: none
+
+.uploadCvPreview
+  border: 1px solid #e4e7f1
+  border-radius: 10px
+  overflow: hidden
+  background: #fff
+
+.uploadCvPreviewHead
+  display: flex
+  align-items: flex-start
+  justify-content: space-between
+  gap: 12px
+  padding: 10px 12px
+  background: #f7f8fc
+  border-bottom: 1px solid #e4e7f1
+
+.uploadCvPreviewMeta
+  min-width: 0
+  flex: 1
+
+.uploadCvPreviewName
+  display: block
+  font-weight: 600
+  color: #1f2551
+  font-size: 14px
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+
+.uploadCvPreviewLabel
+  display: block
+  margin-top: 2px
+  font-size: 12px
+  color: #7b819e
+
+.uploadCvChangeFile
+  flex-shrink: 0
+  padding: 0 !important
+  height: auto !important
+
+.uploadCvPreviewFrame
+  display: block
+  width: 100%
+  height: min(52vh, 420px)
+  min-height: 280px
+  border: none
+  background: #f0f2f8
+
+.uploadCvPreviewOffice
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  gap: 12px
+  min-height: 220px
+  padding: 24px 20px
+  text-align: center
+  p
+    margin: 0
+    max-width: 360px
+    color: #5c6380
+    font-size: 14px
+    line-height: 1.5
+
+.uploadCvPreviewOfficeIcon
+  font-size: 40px
+  line-height: 1
+
+.uploadCvSizeNote
+  margin: 10px 0 0
+  font-size: 12px
+  color: #7b819e
+
+.uploadCvActions
+  display: flex
+  justify-content: flex-end
+  gap: 8px
+  margin-top: 16px
 
 .modalRegisterPanel
   margin: 8px auto 0

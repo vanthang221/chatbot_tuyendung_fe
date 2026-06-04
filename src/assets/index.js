@@ -1,0 +1,5 @@
+export { ReactComponent as WordIcon } from './icons/microsoft-word.svg'
+export { ReactComponent as PdfIcon } from './icons/pdf-icon.svg'
+export { ReactComponent as PptxIcon } from './icons/powerpoint.svg'
+export { ReactComponent as ExcelIcon } from './icons/excel.svg'
+export { ReactComponent as DefaultIcon } from './icons/default-icon.svg'
