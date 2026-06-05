@@ -22,6 +22,7 @@ const PageHeader = () => {
     handleSearch,
     campaigns,
     requestChatAccess,
+    isCandidateRegistered,
   } = useRecruitment();
 
   const handleOpenChat = () => {
@@ -40,7 +41,9 @@ const PageHeader = () => {
         </div>
       </div>
       <div className={cx("headerActions")}>
-        <HeaderChatCta onClick={handleOpenChat} />
+        {!isCandidateRegistered && (
+          <HeaderChatCta onClick={handleOpenChat} />
+        )}
         <div className={cx("headerSearch")}>
           <Input
             value={searchInput}
