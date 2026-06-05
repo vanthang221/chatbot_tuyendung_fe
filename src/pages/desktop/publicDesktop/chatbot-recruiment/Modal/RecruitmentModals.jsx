@@ -1,8 +1,8 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { useRecruitment } from "../../../../context/RecruitmentContext";
-import { findCampaignById } from "./campaignUtils";
-import CandidateInfoModal from "./CandidateInfoModal";
+import { useRecruitment } from "../../../../../context/RecruitmentContext";
+import CandidateInfoModal from "../CandidateInfoModal";
+import { findCampaignById } from "../../../../../utils/constants/config";
 
 const RecruitmentModals = () => {
   const { campaignId } = useParams();

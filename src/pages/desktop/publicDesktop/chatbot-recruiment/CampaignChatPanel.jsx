@@ -23,7 +23,10 @@ import {
   mergeSessionMessagesWithCampaignUi,
 } from "./chatMessageUtils";
 import { buildChatMessagesFromUploadPayload } from "./uploadCvUtils";
-import { saveChatSessionToStorage } from "./chatSessionStorage";
+import {
+  getChatSessionToken,
+  saveChatSessionToStorage,
+} from "./chatSessionStorage";
 import { hasCandidateInfo } from "./candidateStorage";
 import CampaignJdMessage from "./CampaignJdMessage";
 import ChatMarkdownContent from "./ChatMarkdownContent";
@@ -176,6 +179,17 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
     const initSession = async () => {
       setSessionReady(false);
 
+      const storedToken = getChatSessionToken(conversationKey);
+      const cachedMessages = getMessagesForCampaign(conversationKey);
+
+      if (storedToken && cachedMessages.length > 0) {
+        if (!cancelled) {
+          setSessionToken(storedToken);
+          setSessionReady(true);
+        }
+        return;
+      }
+
       try {
         const sessionPayload = {
           candidate: buildCandidatePayload(candidateInfo),
@@ -183,6 +197,10 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
 
         if (campaignId) {
           sessionPayload.campaign_id = campaignId;
+        }
+
+        if (storedToken) {
+          sessionPayload.session_token = storedToken;
         }
 
         const response = await actionEnsureRecruitmentChatSession(sessionPayload);
@@ -219,12 +237,12 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
       cancelled = true;
     };
   }, [
-    campaign,
     campaignId,
     candidateInfo.email,
     candidateInfo.fullName,
     candidateInfo.phone,
     conversationKey,
+    getMessagesForCampaign,
     setMessagesForCampaign,
   ]);
 

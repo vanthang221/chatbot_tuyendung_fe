@@ -5,12 +5,8 @@ import { Button, Col, Input, Radio, Row, Tooltip } from "antd";
 import { IconMoney, Logo } from "../../../../assets/svg/logo";
 import HeaderChatCta from "./HeaderChatCta";
 import { useRecruitment } from "../../../../context/RecruitmentContext";
-import {
-  EDUCATION_OPTIONS,
-  EXPERIENCE_OPTIONS,
-  SALARY_OPTIONS,
-} from "./campaignUtils";
 import styles from "./ChatBotRecruiment.module.sass";
+import { EXPERIENCE_OPTIONS, EDUCATION_OPTIONS, SALARY_OPTIONS } from "../../../../utils/constants/config";
 
 const cx = classNames.bind(styles);
 
@@ -93,7 +89,7 @@ const FilterSidebar = () => {
         </Radio.Group>
       </div>
       <div className={cx("filterDivider")} />
-      <div className={cx("filterGroup")}>
+      {/* <div className={cx("filterGroup")}>
         <h3>Mức lương</h3>
         <Radio.Group
           className={cx("filterOptions")}
@@ -107,7 +103,7 @@ const FilterSidebar = () => {
           ))}
         </Radio.Group>
       </div>
-      <div className={cx("filterDivider")} />
+      <div className={cx("filterDivider")} /> */}
       <div className={cx("filterGroup")}>
         <h3>Trình độ học vấn</h3>
         <Radio.Group

@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames/bind";
 import { Button, Modal, message } from "antd";
-import { actionUploadRecruitmentFile } from "./action";
-import CvFilePreview from "./CvFilePreview";
+import { actionUploadRecruitmentFile } from "../action";
+import CvFilePreview from "../CvFilePreview";
 import {
   CV_MAX_BYTES,
   isAllowedCvFile,
   mapUploadedFileToPayload,
-} from "./uploadCvUtils";
-import styles from "./ChatBotRecruiment.module.sass";
+} from "../uploadCvUtils";
+import styles from "../Modal/../ChatBotRecruiment.module.sass";
 
 const cx = classNames.bind(styles);
 

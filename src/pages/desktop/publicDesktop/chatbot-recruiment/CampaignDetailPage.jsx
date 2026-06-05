@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import classNames from "classnames/bind";
 import { Button, Input } from "antd";
@@ -6,10 +6,8 @@ import { Logo, IconMoney } from "../../../../assets/svg/logo";
 import HeaderChatCta from "./HeaderChatCta";
 import CampaignChatPanel from "./CampaignChatPanel";
 import { useRecruitment } from "../../../../context/RecruitmentContext";
-
-import { findCampaignById } from "./campaignUtils";
-
 import styles from "./ChatBotRecruiment.module.sass";
+import { findCampaignById } from "../../../../utils/constants/config";
 
 const cx = classNames.bind(styles);
 
@@ -260,12 +258,24 @@ const CampaignDetailPage = () => {
   } = useRecruitment();
 
   const campaign = findCampaignById(campaigns, campaignId);
+  const prevCampaignIdRef = useRef(campaignId);
 
   useEffect(() => {
-    if (!isCandidateRegistered || !campaignId) return;
+    if (!isCandidateRegistered || !campaignId) {
+      prevCampaignIdRef.current = campaignId;
+      return;
+    }
 
-    openChatCampaignIds.includes(String(campaignId)) ||
+    const campaignChanged =
+      String(prevCampaignIdRef.current) !== String(campaignId);
+    prevCampaignIdRef.current = campaignId;
+
+    if (
+      campaignChanged &&
+      !openChatCampaignIds.includes(String(campaignId))
+    ) {
       activateChatCampaign(campaignId);
+    }
   }, [
     activateChatCampaign,
     campaignId,
@@ -307,7 +317,13 @@ const CampaignDetailPage = () => {
     const wasActive = String(id) === String(activeChatCampaignId);
     const nextActiveId = closeChatCampaign(id);
 
-    if (wasActive && nextActiveId) {
+    if (!nextActiveId) {
+      activateChatCampaign(null);
+      navigate("/chat");
+      return;
+    }
+
+    if (wasActive) {
       navigate(`/${nextActiveId}`);
     }
   };

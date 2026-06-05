@@ -12,12 +12,7 @@ import {
   loadCandidateFromStorage,
   saveCandidateToStorage,
 } from "../pages/desktop/publicDesktop/chatbot-recruiment/candidateStorage";
-import {
-  buildCampaignListParams,
-  extractCampaignList,
-  FILTER_ALL,
-  normalizeCampaign,
-} from "../pages/desktop/publicDesktop/chatbot-recruiment/campaignUtils";
+import { buildCampaignListParams, extractCampaignList, FILTER_ALL, normalizeCampaign } from "../utils/constants/config";
 
 const RecruitmentContext = createContext(null);
 
