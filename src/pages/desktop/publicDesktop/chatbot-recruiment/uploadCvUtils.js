@@ -118,9 +118,7 @@ export const mapUploadedFileToPayload = (record, fileUrls = []) => {
     path: attachment.path,
     type: record?.content_type || record?.type || "",
     id: record?.id,
-    application_id: record?.application_id,
     candidate_id: record?.candidate_id,
-    storage_key: record?.storage_key,
     extension: attachment.extension,
   };
 };

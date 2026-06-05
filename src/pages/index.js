@@ -22,6 +22,14 @@ const pages = [
     elementMobile: <ChatBotRecruimentMB />,
   },
   {
+    name: "campaign-chat-general",
+    path: "/chat",
+    auth: false,
+    label: "Trò chuyện chung",
+    elementDesktop: <ChatPage />,
+    elementMobile: <ChatBotRecruimentMB />,
+  },
+  {
     name: "campaign-apply",
     path: "/:campaignId/apply",
     auth: false,

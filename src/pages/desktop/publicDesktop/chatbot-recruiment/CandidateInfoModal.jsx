@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import classNames from "classnames/bind";
 import { Button, Checkbox, Form, Input, Modal } from "antd";
 import { useRecruitment } from "../../../../context/RecruitmentContext";
@@ -6,8 +7,14 @@ import styles from "./ChatBotRecruiment.module.sass";
 
 const cx = classNames.bind(styles);
 
-const CandidateInfoModal = ({ open, onClose, campaignTitle = "" }) => {
+const CandidateInfoModal = ({
+  open,
+  onClose,
+  campaignTitle = "",
+  targetPath = "/chat",
+}) => {
   const { candidateInfo, startChatSession } = useRecruitment();
+  const navigate = useNavigate();
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -23,6 +30,7 @@ const CandidateInfoModal = ({ open, onClose, campaignTitle = "" }) => {
 
   const handleFinish = (values) => {
     startChatSession(values, campaignTitle);
+    navigate(targetPath, { replace: true });
   };
 
   return (

@@ -20,13 +20,14 @@ const PageHeader = () => {
     searchInput,
     setSearchInput,
     handleSearch,
-    campaigns,
     requestChatAccess,
     isCandidateRegistered,
   } = useRecruitment();
 
   const handleOpenChat = () => {
-    requestChatAccess(campaigns[0]?.id);
+    if (requestChatAccess(null)) {
+      navigate("/chat");
+    }
   };
 
   return (
@@ -145,9 +146,10 @@ const ListJobCard = ({ campaign, onClick }) => (
         {LIST_META_FIELDS.map((field) => {
           const value = campaign[field.key] ?? "";
           const tooltipTitle = `${field.label}: ${value}`;
+          const mdSize = field.key === "experience" ? 12 : 6;
 
           return (
-            <Col key={field.key} xs={24} md={6} className={cx("metaCol")}>
+            <Col key={field.key} xs={24} md={8} className={cx("metaCol")}>
               <Tooltip title={tooltipTitle} placement="top">
                 <div className={cx("metaCell")}>
                   <span className={cx("metaLabel")}>{field.label}</span>

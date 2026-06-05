@@ -36,6 +36,8 @@ export const RecruitmentProvider = ({ children }) => {
   const [candidateModalOpen, setCandidateModalOpen] = useState(false);
   const [modalCampaignId, setModalCampaignId] = useState(null);
   const [messagesByCampaign, setMessagesByCampaign] = useState({});
+  const [openChatCampaignIds, setOpenChatCampaignIds] = useState([]);
+  const [activeChatCampaignId, setActiveChatCampaignId] = useState(null);
 
   const isCandidateRegistered = useMemo(
     () => hasCandidateInfo(candidateInfo),
@@ -79,6 +81,50 @@ export const RecruitmentProvider = ({ children }) => {
     setCandidateModalOpen(true);
   }, []);
 
+  const openChatCampaign = useCallback((campaignId) => {
+    if (campaignId == null || campaignId === "") return null;
+
+    const id = String(campaignId);
+
+    setOpenChatCampaignIds((prev) =>
+      prev.includes(id) ? prev : [...prev, id],
+    );
+    setActiveChatCampaignId(id);
+    setChatStarted(true);
+
+    return id;
+  }, []);
+
+  const closeChatCampaign = useCallback((campaignId) => {
+    if (campaignId == null || campaignId === "") return null;
+
+    const id = String(campaignId);
+    let nextActiveId = null;
+
+    setOpenChatCampaignIds((prev) => {
+      const next = prev.filter((item) => item !== id);
+      nextActiveId = next[next.length - 1] ?? null;
+      return next;
+    });
+
+    setActiveChatCampaignId((current) => {
+      if (current !== id) return current;
+      return nextActiveId;
+    });
+
+    return nextActiveId;
+  }, []);
+
+  const activateChatCampaign = useCallback((campaignId) => {
+    if (campaignId == null || campaignId === "") return null;
+
+    const id = String(campaignId);
+    setOpenChatCampaignIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    setActiveChatCampaignId(id);
+
+    return id;
+  }, []);
+
   const closeCandidateModal = useCallback(() => {
     setCandidateModalOpen(false);
   }, []);
@@ -119,13 +165,17 @@ export const RecruitmentProvider = ({ children }) => {
   const requestChatAccess = useCallback(
     (campaignId = null) => {
       if (isCandidateRegistered) {
-        setChatStarted(true);
+        if (campaignId != null && campaignId !== "") {
+          openChatCampaign(campaignId);
+        } else {
+          setChatStarted(true);
+        }
         return true;
       }
       openCandidateModal(campaignId);
       return false;
     },
-    [isCandidateRegistered, openCandidateModal],
+    [isCandidateRegistered, openCandidateModal, openChatCampaign],
   );
 
   const handleSearch = () => {
@@ -154,6 +204,11 @@ export const RecruitmentProvider = ({ children }) => {
         isCandidateRegistered,
         chatStarted,
         setChatStarted,
+        openChatCampaignIds,
+        activeChatCampaignId,
+        openChatCampaign,
+        closeChatCampaign,
+        activateChatCampaign,
         candidateModalOpen,
         modalCampaignId,
         openCandidateModal,

@@ -23,10 +23,6 @@ import {
   mergeSessionMessagesWithCampaignUi,
 } from "./chatMessageUtils";
 import { buildChatMessagesFromUploadPayload } from "./uploadCvUtils";
-import {
-  appendExtraMessages,
-  loadExtraMessages,
-} from "./chatExtraMessagesStorage";
 import { saveChatSessionToStorage } from "./chatSessionStorage";
 import { hasCandidateInfo } from "./candidateStorage";
 import CampaignJdMessage from "./CampaignJdMessage";
@@ -80,6 +76,8 @@ const normalizeFilePayloads = (rawFiles) => {
     .filter((file) => file && (file.url || file.cv_path));
 };
 
+const GENERAL_CHAT_KEY = "__general__";
+
 
 
 const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
@@ -91,8 +89,9 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
   } = useRecruitment();
 
   const campaignId = campaign?.id;
-  const messages = getMessagesForCampaign(campaignId);
-  const setMessages = (updater) => setMessagesForCampaign(campaignId, updater);
+  const conversationKey = campaignId ?? GENERAL_CHAT_KEY;
+  const messages = getMessagesForCampaign(conversationKey);
+  const setMessages = (updater) => setMessagesForCampaign(conversationKey, updater);
   const [messageInput, setMessageInput] = useState("");
   const [jdPinned, setJdPinned] = useState(false);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
@@ -165,7 +164,7 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
   };
 
   useEffect(() => {
-    if (!campaignId || !hasCandidateInfo(candidateInfo)) {
+    if (!hasCandidateInfo(candidateInfo)) {
       setSessionReady(false);
 
       setSessionToken(null);
@@ -178,10 +177,15 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
       setSessionReady(false);
 
       try {
-        const response = await actionEnsureRecruitmentChatSession({
-          campaign_id: campaignId,
+        const sessionPayload = {
           candidate: buildCandidatePayload(candidateInfo),
-        });
+        };
+
+        if (campaignId) {
+          sessionPayload.campaign_id = campaignId;
+        }
+
+        const response = await actionEnsureRecruitmentChatSession(sessionPayload);
         if (cancelled) return;
         const payload = response?.data;
         if (payload?.success && payload?.data) {
@@ -189,16 +193,14 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
           setCandidateId(candidate?.id ?? null);
           setSessionToken(session?.session_token || null);
           if (session?.session_token) {
-            saveChatSessionToStorage(campaignId, session.session_token);
+            saveChatSessionToStorage(conversationKey, session.session_token);
           }
-          const candidateEmail = candidateInfo.email?.trim() || "";
           setMessagesForCampaign(
-            campaignId,
+            conversationKey,
             mergeSessionMessagesWithCampaignUi(
               campaign,
               candidateInfo.fullName,
               apiMessages,
-              loadExtraMessages(campaignId, candidateEmail),
             ),
           );
         }
@@ -222,6 +224,7 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
     candidateInfo.email,
     candidateInfo.fullName,
     candidateInfo.phone,
+    conversationKey,
     setMessagesForCampaign,
   ]);
 
@@ -288,24 +291,14 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
     );
     setPendingCvFiles(normalized);
 
-    const applicationId = uploadResult?.payload?.data?.application_id;
-    const nextCandidateInfo = { ...candidateInfo };
     if (normalized.length > 0) {
-      nextCandidateInfo.cv_files = normalized;
-    }
-    if (applicationId != null) {
-      nextCandidateInfo.application_id = applicationId;
-    }
-    if (normalized.length > 0 || applicationId != null) {
-      setCandidateInfo(nextCandidateInfo);
+      setCandidateInfo({ ...candidateInfo, cv_files: normalized });
     }
 
     const uploadMessages = buildChatMessagesFromUploadPayload(
       uploadResult?.payload,
     );
     if (uploadMessages.length > 0) {
-      const candidateEmail = candidateInfo.email?.trim() || "";
-      appendExtraMessages(campaignId, candidateEmail, uploadMessages);
       pendingScrollToEndRef.current = true;
       setMessages((prev) => {
         return mergeChatMessages(prev, uploadMessages);
@@ -323,22 +316,18 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
     setSending(true);
 
     try {
-      const filesToSend =
-        pendingCvFiles.length > 0 ? pendingCvFiles : fallbackCvFiles;
-
-      const response = await actionSendRecruitmentChatMessage({
-        user_id: userInfoPayload.phone,
-        session: sessionKey,
+      const messagePayload = {
         session_id: sessionKey,
-        user_info: userInfoPayload,
-        job_context: jobContextPayload,
         message: text,
-        files: filesToSend,
+        user_info: userInfoPayload,
         session_token: sessionToken,
-        campaign_id: campaignId,
-        content: text,
-        candidate: buildCandidatePayload(candidateInfo),
-      });
+      };
+
+      if (jobContextPayload) {
+        messagePayload.job_context = jobContextPayload;
+      }
+
+      const response = await actionSendRecruitmentChatMessage(messagePayload);
 
       const payload = response?.data;
 
@@ -355,7 +344,7 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
           setSessionToken(payload.data.session.session_token);
 
           saveChatSessionToStorage(
-            campaignId,
+            conversationKey,
             payload.data.session.session_token,
           );
         }
@@ -378,14 +367,12 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
     scrollToLatest("smooth");
   };
 
-  if (!campaign) return null;
-
   const chatInputDisabled = !sessionReady || !sessionToken;
   const sendDisabled = chatInputDisabled || sending;
 
   return (
     <div className={cx("chatPanel")}>
-      {jdPinned && (
+      {campaign && jdPinned && (
         <Button
           type="text"
           className={cx("jdStickyPin")}
@@ -409,7 +396,7 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
       <div className={cx("chatMessagesWrap")}>
         <div ref={scrollRef} className={cx("chatMessages")}>
           {messages.map((message, messageIndex) => {
-            if (message.type === "jd") {
+            if (campaign && message.type === "jd") {
               return (
                 <CampaignJdMessage
                   key={message.id ?? `jd-${messageIndex}`}
@@ -539,11 +526,15 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
           className={cx("quickActionBtn")}
           disabled={chatInputDisabled}
           onClick={() => {
-            setMessageInput("Quy trình ứng tuyển như thế nào?");
+            setMessageInput(
+              campaign
+                ? "Quy trình ứng tuyển như thế nào?"
+                : "Quy trình tuyển dụng chung của công ty như thế nào?",
+            );
             focusMessageInput();
           }}
         >
-          Quy trình ứng tuyển
+          {campaign ? "Quy trình ứng tuyển" : "Quy trình tuyển dụng"}
         </Button>
 
         <Button
@@ -551,11 +542,15 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
           className={cx("quickActionBtn")}
           disabled={chatInputDisabled}
           onClick={() => {
-            setMessageInput("Yêu cầu công việc chi tiết ra sao?");
+            setMessageInput(
+              campaign
+                ? "Yêu cầu công việc chi tiết ra sao?"
+                : "Công ty đang tuyển những vị trí nào?",
+            );
             focusMessageInput();
           }}
         >
-          Yêu cầu công việc
+          {campaign ? "Yêu cầu công việc" : "Vị trí đang tuyển"}
         </Button>
 
         <Button
@@ -563,11 +558,15 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
           className={cx("quickActionBtn")}
           disabled={chatInputDisabled}
           onClick={() => {
-            setMessageInput("Tôi muốn nộp CV trực tiếp.");
+            setMessageInput(
+              campaign
+                ? "Tôi muốn nộp CV trực tiếp."
+                : "Tôi muốn hỏi thêm về cơ hội phù hợp với hồ sơ của tôi.",
+            );
             focusMessageInput();
           }}
         >
-          Tôi muốn nộp CV
+          {campaign ? "Tôi muốn nộp CV" : "Hỏi thêm về cơ hội"}
         </Button>
       </div>
 

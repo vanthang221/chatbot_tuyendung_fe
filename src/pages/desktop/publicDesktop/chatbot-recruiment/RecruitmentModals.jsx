@@ -15,12 +15,14 @@ const RecruitmentModals = () => {
 
   const activeId = modalCampaignId || campaignId;
   const campaign = findCampaignById(campaigns, activeId);
+  const targetPath = activeId ? `/${activeId}` : "/chat";
 
   return (
     <CandidateInfoModal
       open={candidateModalOpen}
       onClose={closeCandidateModal}
       campaignTitle={campaign?.title || ""}
+      targetPath={targetPath}
     />
   );
 };

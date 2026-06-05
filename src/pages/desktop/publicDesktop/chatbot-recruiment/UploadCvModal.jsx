@@ -137,8 +137,9 @@ const UploadCvModal = ({
 
     const formData = new FormData();
     formData.append("file", selectedFile);
-    formData.append("campaign_id", String(campaignId));
-    if (candidateId) {
+    if (campaignId != null && campaignId !== "") {
+      formData.append("campaign_id", String(campaignId));
+    } if (candidateId) {
       formData.append("candidate_id", String(candidateId));
     }
     formData.append("is_cv", "true");

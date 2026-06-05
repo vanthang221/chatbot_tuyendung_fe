@@ -74,25 +74,36 @@ export const buildUserInfoPayload = (candidateInfo) => ({
 export const buildRecruitmentSessionKey = (phone, campaignId) => {
   const sdt = String(phone ?? "").trim();
   const cid = String(campaignId ?? "").trim();
-  if (!sdt || !cid) return cid || sdt || "";
+  if (!sdt && !cid) return "";
+  if (!cid) return sdt ? `${sdt}_2002` : "2002";
   return `${sdt}_${cid}`;
 };
 
-export const buildJobContextPayload = (campaign, campaignId) =>
-  [
-    // `campaign_id: ${campaignId || ""}`,
-    `title: ${campaign?.title || ""}`,
-    `department: ${campaign?.department || ""}`,
-    `location: ${campaign?.location || ""}`,
-    `quantity: ${campaign?.quantity || ""}`,
-    `experience: ${campaign?.experience || ""}`,
-    `education: ${campaign?.education || ""}`,
-    `salary_range: ${campaign?.salaryRange || ""}`,
-    `description: ${toTextList(campaign?.description)}`,
-    `requirements: ${toTextList(campaign?.requirements)}`,
-    `benefits: ${toTextList(campaign?.benefits)}`,
-    `working_time: ${toTextList(campaign?.workingTime)}`,
-  ].join("\n");
+export const buildJobContextPayload = (campaign) =>
+  !campaign
+    ? ""
+    : [
+        // `campaign_id: ${campaign?.id || ""}`,
+        `title: ${campaign?.title || ""}`,
+        `department: ${campaign?.department || ""}`,
+        `location: ${campaign?.location || ""}`,
+        `quantity: ${campaign?.quantity || ""}`,
+        `experience: ${campaign?.experience || ""}`,
+        `education: ${campaign?.education || ""}`,
+        `salary_range: ${campaign?.salaryRange || ""}`,
+        `description: ${toTextList(campaign?.description)}`,
+        `requirements: ${toTextList(campaign?.requirements)}`,
+        `benefits: ${toTextList(campaign?.benefits)}`,
+        `working_time: ${toTextList(campaign?.workingTime)}`,
+      ].join("\n");
+
+export const buildGeneralChatMessages = (candidateName) => [
+  {
+    id: "welcome-general",
+    from: "bot",
+    text: `Xin chào ${candidateName || "bạn"}, mình có thể hỗ trợ các câu hỏi chung về tuyển dụng, CV, phỏng vấn và quy trình ứng tuyển.`,
+  },
+];
 export const buildChatMessagesForCampaign = (campaign, candidateName) => [
   { id: `jd-${campaign.id}`, type: "jd" },
   {
@@ -106,20 +117,22 @@ export const mergeSessionMessagesWithCampaignUi = (
   campaign,
   candidateName,
   apiMessages = [],
-  extraMessages = [],
 ) => {
-  const jdMessage = { id: `jd-${campaign.id}`, type: "jd" };
   const history = Array.isArray(apiMessages) ? apiMessages : [];
-  const extras = Array.isArray(extraMessages) ? extraMessages : [];
 
-  let base;
-  if (history.length === 0) {
-    base = buildChatMessagesForCampaign(campaign, candidateName);
-  } else {
-    base = [jdMessage, ...history];
+  if (!campaign) {
+    if (history.length === 0) {
+      return buildGeneralChatMessages(candidateName);
+    }
+
+    return history;
   }
 
-  if (extras.length === 0) return base;
+  const jdMessage = { id: `jd-${campaign.id}`, type: "jd" };
 
-  return mergeChatMessages(base, extras);
+  if (history.length === 0) {
+    return buildChatMessagesForCampaign(campaign, candidateName);
+  }
+
+  return [jdMessage, ...history];
 };

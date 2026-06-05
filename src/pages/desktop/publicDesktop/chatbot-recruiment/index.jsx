@@ -18,6 +18,7 @@ const ChatBotRecruiment = () => (
         }
       >
         <Route index element={<CampaignListPage />} />
+        <Route path="chat" element={<CampaignDetailPage />} />
         <Route path=":campaignId" element={<CampaignDetailPage />} />
         <Route path=":campaignId/apply" element={<ApplyPage />} />
         <Route path=":campaignId/chat" element={<ChatPage />} />

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import classNames from "classnames/bind";
 import { Button, Input } from "antd";
@@ -157,6 +157,85 @@ const DetailPanel = ({ campaign, onApply }) => (
   </div>
 );
 
+const GeneralDetailPanel = ({ onOpenChat }) => (
+  <div className={cx("detailPanel")}>
+    <div className={cx("detailHeader")}>
+      <div className={cx("detailHeaderInfo")}>
+        <span className={cx("detailTitle")}>Trợ lý tuyển dụng AI</span>
+
+        <p className={cx("departmentLabel")}>Trò chuyện chung</p>
+
+        <div className={cx("detailMetaBar")}>
+          <span className={cx("detailMetaItem")}>
+            <em>Chế độ</em> Hỏi đáp chung
+          </span>
+        </div>
+      </div>
+
+      <button type="button" className={cx("applyButton")} onClick={onOpenChat}>
+        <span className={cx("applyIcon")}>💬</span>
+        Bắt đầu trò chuyện
+      </button>
+    </div>
+
+    <div className={cx("detailContent")}>
+      <DetailSection
+        icon="✨"
+        title="Hỗ trợ chung"
+        values={[
+          "Hỏi về quy trình tuyển dụng",
+          "Hỏi về hồ sơ, CV và phỏng vấn",
+          "Tìm hiểu các vị trí đang tuyển",
+        ]}
+      />
+    </div>
+  </div>
+);
+
+const ChatTabs = ({
+  campaigns,
+  openCampaignIds,
+  activeCampaignId,
+  onActivate,
+  onClose,
+}) => {
+  if (openCampaignIds.length === 0) return null;
+
+  return (
+    <div className={cx("chatTabsBar")} aria-label="Các cuộc trò chuyện đã mở">
+      <div className={cx("chatTabsList")}>
+        {openCampaignIds.map((id) => {
+          const tabCampaign = findCampaignById(campaigns, id);
+          const isActive = String(id) === String(activeCampaignId);
+
+          return (
+            <div key={id} className={cx("chatTab", { active: isActive })}>
+              <button
+                type="button"
+                className={cx("chatTabButton")}
+                onClick={() => onActivate(id)}
+              >
+                <span className={cx("chatTabTitle")}>
+                  {tabCampaign?.title || `JD ${id}`}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                className={cx("chatTabClose")}
+                aria-label={`Đóng tab ${tabCampaign?.title || id}`}
+                onClick={() => onClose(id)}
+              >
+                ×
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 const CampaignDetailPage = () => {
   const { campaignId } = useParams();
 
@@ -174,18 +253,33 @@ const CampaignDetailPage = () => {
     openCandidateModal,
 
     requestChatAccess,
-
-    setChatStarted,
+    openChatCampaignIds,
+    activeChatCampaignId,
+    closeChatCampaign,
+    activateChatCampaign,
   } = useRecruitment();
 
   const campaign = findCampaignById(campaigns, campaignId);
 
-  const showChat = chatStarted && isCandidateRegistered;
+  useEffect(() => {
+    if (!isCandidateRegistered || !campaignId) return;
+
+    openChatCampaignIds.includes(String(campaignId)) ||
+      activateChatCampaign(campaignId);
+  }, [
+    activateChatCampaign,
+    campaignId,
+    isCandidateRegistered,
+    openChatCampaignIds,
+  ]);
+
+  const showChat =
+    chatStarted &&
+    isCandidateRegistered &&
+    (!campaignId || openChatCampaignIds.length > 0);
 
   const handleOpenChat = () => {
-    if (!requestChatAccess(campaignId)) return;
-
-    setChatStarted(true);
+    requestChatAccess(campaignId);
   };
 
   const handleApply = () => {
@@ -195,14 +289,30 @@ const CampaignDetailPage = () => {
       return;
     }
 
-    setChatStarted(true);
+    requestChatAccess(campaignId);
   };
 
   const handleSelectCampaign = (id) => {
+    if (requestChatAccess(id)) {
+      navigate(`/${id}`);
+    }
+  };
+
+  const handleActivateChatTab = (id) => {
+    activateChatCampaign(id);
     navigate(`/${id}`);
   };
 
-  if (!loading && !campaign && campaigns.length > 0) {
+  const handleCloseChatTab = (id) => {
+    const wasActive = String(id) === String(activeChatCampaignId);
+    const nextActiveId = closeChatCampaign(id);
+
+    if (wasActive && nextActiveId) {
+      navigate(`/${nextActiveId}`);
+    }
+  };
+
+  if (!loading && campaignId && !campaign && campaigns.length > 0) {
     return <Navigate to={`/${campaigns[0].id}`} replace />;
   }
 
@@ -213,18 +323,6 @@ const CampaignDetailPage = () => {
 
         <div className={cx("emptyList")}>
           <p>Đang tải thông tin vị trí...</p>
-        </div>
-      </>
-    );
-  }
-
-  if (!campaign) {
-    return (
-      <>
-        <PageHeader onOpenChat={handleOpenChat} />
-
-        <div className={cx("emptyList")}>
-          <p>Không tìm thấy vị trí phù hợp.</p>
         </div>
       </>
     );
@@ -254,11 +352,25 @@ const CampaignDetailPage = () => {
           })}
         >
           {showChat ? (
-            <CampaignChatPanel
-              campaign={campaign}
-              onApply={handleApply}
-              showApplyButton={isCandidateRegistered}
-            />
+            <>
+              <ChatTabs
+                campaigns={campaigns}
+                openCampaignIds={openChatCampaignIds}
+                activeCampaignId={activeChatCampaignId}
+                onActivate={handleActivateChatTab}
+                onClose={handleCloseChatTab}
+              />
+              <CampaignChatPanel
+                key={activeChatCampaignId ?? campaign?.id ?? "general"}
+                campaign={
+                  findCampaignById(campaigns, activeChatCampaignId) || campaign
+                }
+                onApply={handleApply}
+                showApplyButton={isCandidateRegistered}
+              />
+            </>
+          ) : !campaign ? (
+            <GeneralDetailPanel onOpenChat={handleOpenChat} />
           ) : (
             <DetailPanel campaign={campaign} onApply={handleApply} />
           )}
