@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import classNames from "classnames/bind";
 import { Button, Col, Input, Radio, Row, Tooltip } from "antd";
 import { IconMoney, Logo } from "../../../../assets/svg/logo";
-import HeaderChatCta from "./HeaderChatCta";
 import { useRecruitment } from "../../../../context/RecruitmentContext";
 import styles from "./ChatBotRecruiment.module.sass";
-import { EXPERIENCE_OPTIONS, EDUCATION_OPTIONS, SALARY_OPTIONS } from "../../../../utils/constants/config";
+import { EXPERIENCE_OPTIONS, EDUCATION_OPTIONS } from "../../../../utils/constants/config";
+import HeaderChatCta from "../../../../layouts/desktop/Header/HeaderChatCta";
 
 const cx = classNames.bind(styles);
 
@@ -62,8 +62,8 @@ const FilterSidebar = () => {
   const {
     experienceFilter,
     setExperienceFilter,
-    salaryFilter,
-    setSalaryFilter,
+    // salaryFilter,
+    // setSalaryFilter,
     educationFilter,
     setEducationFilter,
   } = useRecruitment();
@@ -142,8 +142,7 @@ const ListJobCard = ({ campaign, onClick }) => (
         {LIST_META_FIELDS.map((field) => {
           const value = campaign[field.key] ?? "";
           const tooltipTitle = `${field.label}: ${value}`;
-          const mdSize = field.key === "experience" ? 12 : 6;
-
+          // const mdSize = field.key === "experience" ? 12 : 6;
           return (
             <Col key={field.key} xs={24} md={8} className={cx("metaCol")}>
               <Tooltip title={tooltipTitle} placement="top">

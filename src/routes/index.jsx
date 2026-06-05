@@ -1,11 +1,11 @@
 import React from "react";
 import { Routes, Route, Outlet } from "react-router-dom";
-import { RecruitmentProvider } from "../../../../context/RecruitmentContext";
-import RecruitmentLayout from "../../../../layouts/desktop/RecruitmentLayout";
-import CampaignListPage from "./CampaignListPage";
-import CampaignDetailPage from "./CampaignDetailPage";
-import ApplyPage from "./ApplyPage";
-import ChatPage from "./ChatPage";
+import { RecruitmentProvider } from "../context/RecruitmentContext";
+import RecruitmentLayout from "../layouts/desktop/RecruitmentLayout";
+import CampaignListPage from "../pages/desktop/publicDesktop/chatbot-recruiment/CampaignListPage";
+import CampaignDetailPage from "../pages/desktop/publicDesktop/chatbot-recruiment/CampaignDetailPage";
+import ApplyPage from "../pages/desktop/publicDesktop/chatbot-recruiment/ApplyPage";
+import ChatPage from "../layouts/desktop/ChatPage";
 
 const ChatBotRecruiment = () => (
   <RecruitmentProvider>

@@ -3,11 +3,11 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import classNames from "classnames/bind";
 import { Button, Input } from "antd";
 import { Logo, IconMoney } from "../../../../assets/svg/logo";
-import HeaderChatCta from "./HeaderChatCta";
 import CampaignChatPanel from "./CampaignChatPanel";
 import { useRecruitment } from "../../../../context/RecruitmentContext";
 import styles from "./ChatBotRecruiment.module.sass";
 import { findCampaignById } from "../../../../utils/constants/config";
+import HeaderChatCta from "../../../../layouts/desktop/Header/HeaderChatCta";
 
 const cx = classNames.bind(styles);
 

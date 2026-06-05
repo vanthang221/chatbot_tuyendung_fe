@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames/bind";
-import { Chatbot } from "../../../../assets/svg";
-import styles from "./ChatBotRecruiment.module.sass";
+import { Chatbot } from "../../../assets/svg";
+import styles from "../../../../src/pages/desktop/publicDesktop/chatbot-recruiment/ChatBotRecruiment.module.sass";
 
 const cx = classNames.bind(styles);
 

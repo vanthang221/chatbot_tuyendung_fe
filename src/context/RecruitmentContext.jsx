@@ -7,12 +7,8 @@ import React, {
   useState,
 } from "react";
 import { actionGetRecruiment } from "../pages/desktop/publicDesktop/chatbot-recruiment/action";
-import {
-  hasCandidateInfo,
-  loadCandidateFromStorage,
-  saveCandidateToStorage,
-} from "../pages/desktop/publicDesktop/chatbot-recruiment/candidateStorage";
 import { buildCampaignListParams, extractCampaignList, FILTER_ALL, normalizeCampaign } from "../utils/constants/config";
+import { saveCandidateToStorage, loadCandidateFromStorage, hasCandidateInfo } from "../utils/helps";
 
 const RecruitmentContext = createContext(null);
 

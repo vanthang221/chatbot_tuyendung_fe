@@ -1,8 +1,8 @@
 import CampaignListPage from "./desktop/publicDesktop/chatbot-recruiment/CampaignListPage";
 import CampaignDetailPage from "./desktop/publicDesktop/chatbot-recruiment/CampaignDetailPage";
 import ApplyPage from "./desktop/publicDesktop/chatbot-recruiment/ApplyPage";
-import ChatPage from "./desktop/publicDesktop/chatbot-recruiment/ChatPage";
 import ChatBotRecruimentMB from "./mobile/chatbot-recruiment";
+import ChatPage from "../layouts/desktop/ChatPage";
 
 const pages = [
   {

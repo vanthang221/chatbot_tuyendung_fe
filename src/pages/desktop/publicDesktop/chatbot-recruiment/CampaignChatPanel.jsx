@@ -23,14 +23,10 @@ import {
   mergeSessionMessagesWithCampaignUi,
 } from "./chatMessageUtils";
 import { buildChatMessagesFromUploadPayload } from "./uploadCvUtils";
-import {
-  getChatSessionToken,
-  saveChatSessionToStorage,
-} from "./chatSessionStorage";
-import { hasCandidateInfo } from "./candidateStorage";
 import CampaignJdMessage from "./CampaignJdMessage";
 import ChatMarkdownContent from "./ChatMarkdownContent";
 import styles from "./ChatBotRecruiment.module.sass";
+import { hasCandidateInfo, saveChatSessionToStorage, getChatSessionToken } from "../../../../utils/helps";
 const cx = classNames.bind(styles);
 
 const SCROLL_BOTTOM_THRESHOLD = 80;
@@ -101,7 +97,6 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
   const [sessionToken, setSessionToken] = useState(null);
   const [sessionReady, setSessionReady] = useState(false);
   const [sending, setSending] = useState(false);
-  const [pendingCvFiles, setPendingCvFiles] = useState([]);
   const [candidateId, setCandidateId] = useState(null);
   const scrollRef = useRef(null);
   const jdRef = useRef(null);
@@ -142,15 +137,6 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
   };
 
   const hasUserMessages = messages.some((message) => message.from === "user");
-  const fallbackCvFiles = normalizeFilePayloads(
-    candidateInfo?.file_payloads ||
-    candidateInfo?.cvFiles ||
-    candidateInfo?.cv_files ||
-    candidateInfo?.uploadedFiles ||
-    candidateInfo?.resumeFiles ||
-    candidateInfo?.cv ||
-    [],
-  );
   const userInfoPayload = buildUserInfoPayload(candidateInfo);
   const jobContextPayload = buildJobContextPayload(campaign, campaignId);
   const sessionKey = buildRecruitmentSessionKey(
@@ -307,7 +293,6 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
     const normalized = normalizeFilePayloads(
       Array.isArray(files) ? files : [],
     );
-    setPendingCvFiles(normalized);
 
     if (normalized.length > 0) {
       setCandidateInfo({ ...candidateInfo, cv_files: normalized });
@@ -373,7 +358,6 @@ const CampaignChatPanel = ({ campaign, onApply, showApplyButton }) => {
       console.log(error);
       setMessages((prev) => prev.filter((item) => item.id !== tempUserId));
     } finally {
-      setPendingCvFiles([]);
       pendingScrollToEndRef.current = true;
       setSending(false);
       focusMessageInput();
